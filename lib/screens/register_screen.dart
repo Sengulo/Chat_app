@@ -1,153 +1,92 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
 import '../services/auth_service.dart';
+import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool isLoading = false;
+  bool loading = false;
 
-  void registerUser() async {
-    if (!_formKey.currentState!.validate()) return;
-
+  void register() async {
     setState(() {
-      isLoading = true;
+      loading = true;
     });
 
     String? result = await AuthService().registerUser(
-      name: nameController.text.trim(),
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
+      nameController.text.trim(),
+      emailController.text.trim(),
+      passwordController.text.trim(),
     );
 
     setState(() {
-      isLoading = false;
+      loading = false;
     });
 
-    if (result == "success") {
+    if (result == null) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => LoginScreen()));
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Successful! Please Login")));
+          context, MaterialPageRoute(builder: (_) => HomeScreen()));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(result ?? "Error")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Padding(
+        padding: EdgeInsets.all(24.0),
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 30),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.person_add, size: 80, color: Theme.of(context).primaryColor),
+                Icon(Icons.person_add, size: 100, color: Colors.deepPurple),
                 SizedBox(height: 20),
-                Text("Create Account",
-                    style:
-                    TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                Text(
+                  "Create Account",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(height: 10),
-                Text("Register to start chatting",
-                    style: TextStyle(fontSize: 16, color: Colors.grey)),
-                SizedBox(height: 30),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          hintText: "Full Name",
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your name";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          hintText: "Email",
-                          prefixIcon: Icon(Icons.email),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter email";
-                          }
-                          if (!value.contains("@")) {
-                            return "Enter valid email";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      TextFormField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Password",
-                          prefixIcon: Icon(Icons.lock),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter password";
-                          }
-                          if (value.length < 6) {
-                            return "Password too short";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 30),
-                      isLoading
-                          ? CircularProgressIndicator()
-                          : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: registerUser,
-                          child: Text("Register"),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Already have an account? "),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => LoginScreen()));
-                            },
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                )
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                      labelText: 'Full Name',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                ),
+                SizedBox(height: 20),
+                loading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                  onPressed: register,
+                  child: Text("Register"),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50)),
+                ),
               ],
             ),
           ),

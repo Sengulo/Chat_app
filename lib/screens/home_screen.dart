@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
 import 'users_screen.dart';
-//import 'profile_screen.dart';
+import 'profile_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     ChatsScreen(),
     UsersScreen(),
-    //ProfileScreen(),
+    ProfileScreen(),
     // You can add SettingsScreen later if you want
     Center(child: Text("Settings Screen")),
   ];
